@@ -1,8 +1,8 @@
 // main.ts
 import indexHandler from "./handler/index.ts";
 
-console.log("Listening on http://localhost:8080");
-Deno.serve(indexHandler, { addr: ":8080" });
+// console.log("Listening on http://localhost:8080");
+Deno.serve(indexHandler);
 
 // const OPENAI_API_HOST = "api.groq.com";
 
