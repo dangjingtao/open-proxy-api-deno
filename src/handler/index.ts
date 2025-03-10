@@ -15,6 +15,19 @@ if (!API_KEY) {
 }
 
 const handler = async (request: Request): Promise<Response> => {
+  const headers = new Headers();
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  headers.set("Access-Control-Allow-Credentials", "true");
+
+  if (request.method === "OPTIONS") {
+    return new Response(null, { headers });
+  }
+
   const url = new URL(request.url);
   const filePath = url.pathname;
   const authHeader = request.headers.get("Authorization");
