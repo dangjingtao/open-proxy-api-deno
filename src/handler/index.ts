@@ -1,34 +1,40 @@
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
-import groqHandler from "./groq.ts";
+import {
+  handleNotFound,
+  handleRoot,
+  handleUnauthorized,
+  baseForwarding,
+} from "./base.ts";
+import { providerConfig, ProviderKeys } from "../config/provider.config.ts";
 
-const handler = (request: Request): Response => {
-  const apiKey = Deno.env.get("API_KEY");
+const providers = Object.keys(providerConfig) as ProviderKeys[];
+const API_KEY = Deno.env.get("API_KEY");
+
+if (!API_KEY) {
+  throw new Error("API_KEY is not set in the environment variables");
+}
+
+const handler = async (request: Request): Promise<Response> => {
   const url = new URL(request.url);
-
-  // 处理主页面
   const filePath = url.pathname;
   const authHeader = request.headers.get("Authorization");
 
-  if (authHeader === `Bearer ${apiKey}`) {
-    if (filePath === "/") {
-      return new Response("Hello, open-proxy-api-deno!", {
-        status: 200,
-        headers: { "content-type": "text/plain" },
-      });
-    } else if (filePath.startsWith("/groq")) {
-      return groqHandler(request);
-    } else {
-      return new Response("Not Found", {
-        status: 404,
-        headers: { "content-type": "text/plain" },
-      });
-    }
-  } else {
-    return new Response("Unauthorized", {
-      status: 401,
-      headers: { "content-type": "text/plain" },
-    });
+  if (authHeader !== `Bearer ${API_KEY}`) {
+    return handleUnauthorized();
   }
+
+  if (filePath === "/") {
+    return handleRoot();
+  }
+
+  for (const provider of providers) {
+    const providerPath = `/${provider}`;
+    if (filePath.startsWith(providerPath)) {
+      return await baseForwarding({ request, providerName: provider });
+    }
+  }
+
+  return handleNotFound();
 };
 
 export default handler;
