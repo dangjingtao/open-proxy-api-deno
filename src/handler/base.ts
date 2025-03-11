@@ -1,7 +1,19 @@
+import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
 import { modifyUrlPath } from "../lib/urlUtils.ts";
 import { providerConfig, ProviderKeys } from "../config/provider.config.ts";
 
-const TEXT_PLAIN = { "content-type": "text/plain" };
+const getBaseHeaders = () => {
+  const headers = new Headers();
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  headers.set("Access-Control-Allow-Headers", "*");
+  headers.set("Access-Control-Allow-Credentials", "true");
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Content-Type", "text/plain");
+  return headers;
+};
 
 export const handleOPTIONS = (headers: Headers): Response => {
   headers.set(
@@ -13,24 +25,40 @@ export const handleOPTIONS = (headers: Headers): Response => {
   return new Response("", { headers, status: 200 });
 };
 
+export const handleLogin = (): Response => {
+  const headers = new Headers();
+  headers.set(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+  headers.set("Access-Control-Allow-Headers", "*");
+  headers.set("Access-Control-Allow-Credentials", "true");
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Content-Type", "text/plain");
+  return new Response("Hello, open-proxy-api-deno!", {
+    status: 200,
+    headers: headers,
+  });
+};
+
 export const handleRoot = (): Response => {
   return new Response("Hello, open-proxy-api-deno!", {
     status: 200,
-    headers: TEXT_PLAIN,
+    headers: getBaseHeaders(),
   });
 };
 
 export const handleNotFound = (): Response => {
   return new Response("Not Found", {
     status: 404,
-    headers: TEXT_PLAIN,
+    headers: getBaseHeaders(),
   });
 };
 
 export const handleUnauthorized = (): Response => {
   return new Response("Unauthorized", {
     status: 401,
-    headers: TEXT_PLAIN,
+    headers: getBaseHeaders(),
   });
 };
 

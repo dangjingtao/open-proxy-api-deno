@@ -1,9 +1,11 @@
 import "https://deno.land/x/dotenv@v3.2.2/load.ts";
+// import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
 import {
   handleOPTIONS,
   handleNotFound,
   handleRoot,
   handleUnauthorized,
+  handleLogin,
   baseForwarding,
 } from "./base.ts";
 import { providerConfig, ProviderKeys } from "../config/provider.config.ts";
@@ -23,7 +25,7 @@ const handler = async (request: Request): Promise<Response> => {
   if (origin && allowedOrigins.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
   }
-
+  console.log(request.method);
   if (request.method === "OPTIONS") {
     return handleOPTIONS(headers);
   }
@@ -36,9 +38,14 @@ const handler = async (request: Request): Promise<Response> => {
     return handleUnauthorized();
   }
 
+  if (filePath.startsWith("/login")) {
+    return handleLogin();
+  }
+
   if (filePath === "/") {
     return handleRoot();
   }
+
   for (const provider of providers) {
     const providerPath = `/${provider}`;
     if (filePath.startsWith(providerPath)) {
