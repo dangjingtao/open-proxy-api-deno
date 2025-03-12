@@ -1,5 +1,24 @@
 // main.ts
+import { Application } from "jsr:@oak/oak";
 import indexHandler from "./handler/index.ts";
+import router from "./router/index.ts";
+import auth from "./middlewares/auth.ts";
+const app = new Application();
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+// app.use(auth);
+
+await app.listen({ port: 8001 });
+
+// app.use(async (context, next) => {
+//   const authHeader = context.request.headers.get("Authorization");
+//   if (authHeader !== `Bearer ${API_KEY}`) {
+//     // context.response.body = handleUnauthorized();
+//     return;
+//   }
+//   await next();
+// });
 
 // console.log("Listening on http://localhost:8080");
 Deno.serve(indexHandler);
