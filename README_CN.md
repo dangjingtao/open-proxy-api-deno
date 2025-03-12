@@ -112,3 +112,45 @@ curl --request GET \
 
 9. 部署成功后获得域名，点开即用。
 
+## 调用示例
+
+```js
+async function fetchFileContent({
+  owner,
+  repo,
+  branch,
+  filePath,
+  token = null,
+}) {
+  const url = `http://localhost:8000/github-api/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
+
+  const headers = {
+    Accept: "application/vnd.github.v3+json",
+  };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, { headers });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching ${filePath}: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return atob(data.content);
+}
+
+// 使用示例
+fetchFileContent({
+  owner: "dangjingtao",
+  repo: "ui-chat-view",
+  branch: "main",
+  filePath: "README.md",
+  token: '<your api key>',
+})
+  .then((content) => console.log(content))
+  .catch((error) => console.error(error));
+```
+
