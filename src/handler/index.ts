@@ -8,10 +8,9 @@ import {
   handleLogin,
   baseForwarding,
 } from "./base.ts";
-import { providerConfig, ProviderKeys } from "../config/provider.config.ts";
+import { providerConfig } from "../config/provider.config.ts";
 import { allowedOrigins } from "../config/origin.config.ts";
 
-const providers = Object.keys(providerConfig) as ProviderKeys[];
 const API_KEY = Deno.env.get("API_KEY");
 
 if (!API_KEY) {
@@ -25,7 +24,7 @@ const handler = async (request: Request): Promise<Response> => {
   if (origin && allowedOrigins.includes(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
   }
-  console.log(request.method);
+
   if (request.method === "OPTIONS") {
     return handleOPTIONS(headers);
   }
@@ -46,10 +45,10 @@ const handler = async (request: Request): Promise<Response> => {
     return handleRoot();
   }
 
-  for (const provider of providers) {
-    const providerPath = `/${provider}`;
+  for (const provider of providerConfig) {
+    const providerPath = `/${provider.provider_name}`;
     if (filePath.startsWith(providerPath)) {
-      return await baseForwarding({ request, providerName: provider });
+      return await baseForwarding({ request, provider });
     }
   }
 

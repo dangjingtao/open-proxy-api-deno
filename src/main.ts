@@ -1,15 +1,15 @@
 // main.ts
-import { Application } from "jsr:@oak/oak";
+// import { Application } from "jsr:@oak/oak";
 import indexHandler from "./handler/index.ts";
-import router from "./router/index.ts";
-import auth from "./middlewares/auth.ts";
-const app = new Application();
+// import router from "./router/index.ts";
+// import auth from "./middlewares/auth.ts";
+// const app = new Application();
 
-app.use(router.routes());
-app.use(router.allowedMethods());
-// app.use(auth);
+// app.use(router.routes());
+// app.use(router.allowedMethods());
+// // app.use(auth);
 
-await app.listen({ port: 8001 });
+// await app.listen({ port: 8001 });
 
 // app.use(async (context, next) => {
 //   const authHeader = context.request.headers.get("Authorization");

@@ -1,6 +1,6 @@
-import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
+// import { verify } from "https://deno.land/x/djwt@v2.4/mod.ts";
 import { modifyUrlPath } from "../lib/urlUtils.ts";
-import { providerConfig, ProviderKeys } from "../config/provider.config.ts";
+import { ProviderConfigItem } from "../config/provider.config.ts";
 
 const getBaseHeaders = () => {
   const headers = new Headers();
@@ -64,20 +64,27 @@ export const handleUnauthorized = (): Response => {
 
 export const baseForwarding = async ({
   request,
-  providerName,
+  provider,
 }: {
   request: Request;
-  providerName: ProviderKeys;
+  provider: ProviderConfigItem;
 }) => {
   try {
-    const realUrlPath = modifyUrlPath(request.url, providerName);
-    const API_HOST = providerConfig[providerName].api_host;
-    const API_KEY = Deno.env.get(`${providerName.toUpperCase()}_API_KEY`);
+    const { provider_name, api_host, require_api_key } = provider;
+    const realUrlPath = modifyUrlPath(request.url, provider_name);
+    const API_HOST = api_host;
+    const API_KEY = Deno.env.get(`${provider_name.toUpperCase()}_API_KEY`);
 
     const authHeaders = new Headers(request.headers);
-    authHeaders.set("Authorization", `Bearer ${API_KEY}`);
+
+    if (require_api_key) {
+      authHeaders.set("Authorization", `Bearer ${API_KEY}`);
+    } else {
+      authHeaders.delete("Authorization");
+    }
 
     const currentUrl = API_HOST + realUrlPath;
+    console.log(currentUrl);
 
     const newRequest = new Request(currentUrl, {
       headers: authHeaders,
